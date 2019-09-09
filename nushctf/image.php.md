@@ -34,7 +34,7 @@ It involves manipulation of the JPEG EXIF metadata to add code in the comments f
 
 ### Execution
 With this information, we can formulate the exploit.
-I used a random JPEG image:
+I used a random JPEG image:  
 ![cat](cat.jpeg)
 
 To edit the JPEG headers, I used [jhead](http://www.sentex.net/~mwandel/jhead/).  
@@ -52,7 +52,7 @@ Reading the modified JPEG file, we can see that our payload is in the JPEG metad
 ```
 
 I also had to change the extension of the file from `.jpeg` to `.php` so that the webserver executes our payload.  
-The modified image is at [cat.jpeg.php]():
+The modified image is at [cat.jpeg.php]():  
 ![cat.jpeg.php](cat.jpeg.php)  
 The image still loads as normal, so all is good.
 
