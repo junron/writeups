@@ -1,4 +1,4 @@
-#Blind Sql
+# Blind Sql
 
 * **Category:** Web
 * **Points:** 500
