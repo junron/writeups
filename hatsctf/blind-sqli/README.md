@@ -62,4 +62,4 @@ Running requests in parallel is much faster, yielding the flag in less than a mi
 
 ##### Notes:
 <sup>1</sup>Binary search requires log<sub>2</sub>(n) comparisons for a set of n possibilities. For ASCII characters, n = 128, log<sub>2</sub>(128) = 7.  
-Note that this is much faster than brute forcing the flag, which requires 127<sup>85</sup> guesses.
+Note that this is much faster than brute forcing the flag, which requires 128<sup>85</sup> guesses.
