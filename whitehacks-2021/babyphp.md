@@ -38,7 +38,7 @@ if(md5($c1) != 0 || $c2 != sha1($c2)) {
 }
 ```
 
-The second part is a bit more challenging. It is widely known that ~~php sucks~~ php suffers from a range of vulnerabilities, but [magic hashes](https://www.whitehatsec.com/blog/magic-hashes/) is less well known.
+The second part is a bit more challenging. It is widely known that ~~php sucks~~ php suffers from a range of vulnerabilities, but [magic hashes](https://www.whitehatsec.com/blog/magic-hashes/) are less well known.
 
 #### Part 1.1: Type juggling
 
@@ -56,7 +56,7 @@ When the two values being compared are of different types, such as int and strin
 
 Example 3 is a lot more interesting. `"0e12"` and `"0e11"` are clearly strings, that are clearly not equal. Well, PHP interprets a string starting  with `[x]e` followed by digits as `x *  10 ** digits`. For example, `"2e6"==2000000` (2 million). 
 
-While `"0e12"` and `"0e11"` are clearly not equal, $0*10**12=0*10**13=0`. 
+While `"0e12"` and `"0e11"` are clearly not equal, `0*10**12=0*10**13=0`. 
 
 Read more: [here](https://news.ycombinator.com/item?id=9484757)
 
