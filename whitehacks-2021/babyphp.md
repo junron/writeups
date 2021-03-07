@@ -22,7 +22,7 @@ if ($t !== base64_encode("ILuvWH2021")) {
 }
 ```
 
-The code checks that the `ticket` HTTP parameter is equal to the [base64 encoded]([Base64 - Wikipedia](https://en.wikipedia.org/wiki/Base64)) version of `ILuvWH2021`, which is `SUx1dldIMjAyMQ==`
+The code checks that the `ticket` HTTP parameter is equal to the [base64 encoded](https://en.wikipedia.org/wiki/Base64) version of `ILuvWH2021`, which is `SUx1dldIMjAyMQ==`
 
 ## Part 2:
 
@@ -38,7 +38,7 @@ if(md5($c1) != 0 || $c2 != sha1($c2)) {
 }
 ```
 
-The second part is a bit more challenging. It is widely known that ~~php sucks~~ php suffers from a range of vulnerabilities, but [magic hashes]([Magic Hashes | WhiteHat Security](https://www.whitehatsec.com/blog/magic-hashes/)) is less well known.
+The second part is a bit more challenging. It is widely known that ~~php sucks~~ php suffers from a range of vulnerabilities, but [magic hashes](https://www.whitehatsec.com/blog/magic-hashes/) is less well known.
 
 #### Part 1.1: Type juggling
 
@@ -54,9 +54,9 @@ Interestingly, all of the above comparisons are True.
 
 When the two values being compared are of different types, such as int and string in example 1 and 2, PHP coerces the string to an int and compares them.
 
-Example 3 is a lot more interesting. `"0e12"` and `"0e11"` are clearly strings, that are clearly not equal. Well, PHP interprets a string starting  with `[x]e` followed by digits as $x\cdot 10 ^{\text{digits}}$. For example, `"2e6"==2000000` (2 million). 
+Example 3 is a lot more interesting. `"0e12"` and `"0e11"` are clearly strings, that are clearly not equal. Well, PHP interprets a string starting  with `[x]e` followed by digits as `x *  10 ** digits`. For example, `"2e6"==2000000` (2 million). 
 
-While `"0e12"` and `"0e11"` are clearly not equal, $0\cdot10^{12}=0\cdot10^{13}=0$. 
+While `"0e12"` and `"0e11"` are clearly not equal, $0*10**12=0*10**13=0`. 
 
 Read more: [here](https://news.ycombinator.com/item?id=9484757)
 
