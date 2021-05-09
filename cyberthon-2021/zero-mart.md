@@ -108,7 +108,7 @@ balance = data["balance"]
 
 Because `os.system("ls")` returns `0`, and `0` is not a dictionary, the process crashes. During the CTF, I tried several different ways of exfiltrating the flag from the server, such as reverse shell and HTTP requests but none were successful :<.
 
-The challenge authors may have decided to make it harder by blocking all network connections out of the service. Anyway, we can still transfer data out through the service itself.
+The challenge authors may have decided to make it harder by blocking all network connections out of the service^. Anyway, we can still transfer data out through the service itself.
 
 ```python
 class Exploit:
@@ -150,3 +150,4 @@ print(int_to_bytes(balance))
 
 While I didn't solve this challenge within the CTF, it's still an interesting challenge that required me to think out of the box.
 
+^ Network connections out of the service weren't actually blocked. I probably just had a problem getting a reverse shell to work.
