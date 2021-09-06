@@ -188,7 +188,7 @@ The first 2 instructions of the shellcode already take up 13 bytes. We only have
 ```
 |       buffer (16 bytes)         |
 |part 1 (15 bytes)|canary (1 byte)|rbp (8 bytes)|rip (8 bytes)| remaining writable stack (16 bytes) |
-															  ^ rsp is here :)
+                                                              ^ rsp is here :)
 ```
 
 ```python
