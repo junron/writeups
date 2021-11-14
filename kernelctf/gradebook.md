@@ -39,7 +39,7 @@ Let's start with `add_student`:
 
 <img src="images/image-20211114154956512.png" alt="image-20211114154956512" style="zoom:80%;" />
 
-First, a block of memory 24 bytes long is allocated on the heap (line 9). This will be used to store metadata about the student. Next, we are prompted for a student ID (line 11 and 12) and the lookup function checks that the student ID was not previously assigned. This has a maximum length of 8 characters and it doesn't appear to be any buffer overflow here. Next, we are prompted for the length of the student's name (line 17 and 18) and a buffer of equal size is allocated on the heap (line 19). This size is stored into `[s+12]`. 
+First, a block of memory 24 bytes long is allocated on the heap (line 9). This will be used to store metadata about the student. Next, we are prompted for a student ID (line 11 and 12) and the lookup function checks that the student ID was not previously assigned. This has a maximum length of 8 characters and there doesn't appear to be any buffer overflow here. Next, we are prompted for the length of the student's name (line 17 and 18) and a buffer of equal size is allocated on the heap (line 19). This size is stored into `[s+12]`. 
 
 We can then write data into this buffer. Again, it appears there is no buffer overflow as there is adequate bounds checking. One note is `read` does not null terminate its output, so it could allow us to read stuff that's immediately after the string. Finally, a pointer to this buffer is stored into the metadata buffer and a pointer to the metadata buffer is stored into the global students array. 
 
@@ -51,11 +51,11 @@ Let's move on to the `update_grade` function. This is where it gets more interes
 
 <img src="images/image-20211114155853882.png" alt="image-20211114155853882" style="zoom:80%;" />
 
-We are prompted for a student ID. If this ID is valid, we are prompted for a number, which is supposed to be between 0 and 100. But is it really? Let's look at the check involved. Firstly, the format specifier used in line 20 is `%ld` and `%d` as we would usually expect for integers. In fact, `%ld` is the format specifier for longs, which are usually 64 bits (or 8 bytes or 4 words) long, while integers are usually 32 bits (4 bytes or 2 words) long. 
+We are prompted for a student ID. If this ID is valid, we are prompted for a number, which is supposed to be between 0 and 100. But is it really? Let's look at the check involved. Firstly, the format specifier used in line 20 is `%ld` instead of `%d` as we would usually expect for integers. In fact, `%ld` is the format specifier for longs, which are usually 64 bits (or 8 bytes or 4 words) long, while integers are usually 32 bits (4 bytes or 2 words) long. 
 
 Suppose the grade I enter is `0xaaaaaaaabbbbbbbb` (there are 8 `a`s and 8`b`s, which make up 64 bits in total). Since the binary is little-endian, this number is stored in memory as `bb bb bb bb aa aa aa aa`. In line 20, the memory at `[s+8]` is compared as an int, which is only 4 bytes. Thus, only the less significant 32 bits (`0xbbbbbbbb`) will be read and compared. Since this is much larger than 100, the else block is executed, which supposedly sets the grade to `-1`. However, it only operates on a `DWORD` (double word ie 4 bytes) of memory. This leaves the `aa aa aa aa` untouched. In the end, the memory at `[s+8]` will look like `ff ff ff ff aa aa aa aa`. 
 
-Well, clearly something unexpected is happening here: we're writing 8 bytes, when we should only be writing 4 bytes. Where do the other 4 bytes end up? If we look back to the `add_student` function above, `[s+12]` is actually where the size of the student's name buffer is stored. This is very important as meddling with the size could allow us to perform a buffer overflow and write arbitrary data. 
+Well, clearly something unexpected is happening here: we're writing 8 bytes, when we should only be writing 4 bytes. Where do the other 4 bytes end up? If we look back to the `add_student` function above, `[s+12]` is actually where the size of the student's name buffer is stored. This is very important, as meddling with the size could allow us to perform a buffer overflow and write arbitrary data. 
 
 In fact, the next function, `update_name` allows us to do just this:
 
@@ -130,7 +130,7 @@ If you haven't done any heap challenges before, you should watch [this video](ht
 
 The first step is to leak the libc address. This is really important because ASLR is probably enabled and since `__malloc_hook` is in libc, we need to know exactly where it is in order to write to it.
 
-To do this, I created two students, and longname, with name buffer size 1250 and shortname, with name buffer size 20.
+To do this, I created two students, longname, with name buffer size 1250, and shortname, with name buffer size 20.
 
 <img src="images/image-20211114170836188.png" alt="image-20211114170836188" style="zoom:80%;" />
 
@@ -146,7 +146,7 @@ Let's run `heap chunks` to see what has become of the data:
 
 <img src="images/image-20211114171329429.png" alt="image-20211114171329429" style="zoom:80%;" />
 
-The smaller chunks' data is replaced by forward and backward pointers, which are part of the tcache structure. The tcache is basically a linked list of freed blocks, and when a small amount memory is allocated, the tcache is traversed to find a suitable block.
+The smaller chunks' data is replaced by forward pointers, which are part of the tcache structure. The tcache is basically a linked list of freed blocks, and when a small amount memory is allocated, the tcache is accessed to find a suitable block.
 
 What's interesting is the large block at address `0x5555555592c0`. Instead of heap addresses, they look like much higher stack addresses. I'm not too familiar with how unsorted bins are organized, but luckily for me, this addresses has a constant offset of +`0x1ebbe0` or +2014176 from the libc base address. 
 
@@ -183,11 +183,11 @@ typedef struct tcache_entry
 } tcache_entry;
 ```
 
-The tcache starts at `0x00005555555597d0` with `next` pointing to `0x5555555592a0` (green arrow). `0x5555555592a0` is itself a tcache block, but its `next` point is null. This signals the end of the tcache. When memory of size `20` are allocated, the block at `0x00005555555597d0` will be used first. Then, the value at the `next` pointer will be stored in memory and set as the start of the tcache. This process repeats until the tcache is empty. In our case, the first allocation is used to store student metadata, while the second allocation stores the student name, which we can write to.
+The tcache starts at `0x00005555555597d0` with `next` pointing to `0x5555555592a0` (green arrow). `0x5555555592a0` is itself a tcache block, but its `next` pointer is null. This signals the end of the tcache. When memory blocks of size `20` are allocated, the block at `0x00005555555597d0` will be used first. Then, the value at the `next` pointer will be stored in the stack and set as the start of the tcache. This process repeats until the tcache is empty. In our case, the first allocation is used to store student metadata, while the second allocation stores the student name, which we can write to.
 
 By using our heap overflow, we can overwrite the `next` pointer of  `0x00005555555597d0`. Thus, when `0x00005555555597d0` is allocated, the start of the tcache will become whatever address we wrote. Then, when the next block is allocated, `malloc` will return a pointer to the address we wrote, since we've tricked it into thinking that's part of the tcache. We can then write arbitrary data into this address.
 
-Let's see this attack in action. The name buffer of a1 starts at `0x00005555555592c0`, and the next pointer we want to write is at `0x00005555555597d0`. It seems that the offset is 1296 bytes. However, there is a header containing metadata about the chunk size that starts 8 bytes before the data. Therefore, the offset is actually 1288. The metadata is `0x21`, which consists of the chunk length (32 bytes), with the least significant bit set as a flag `PREV_INUSE`.
+Let's see this attack in action. The name buffer of a1 starts at `0x00005555555592c0`, and the next pointer we want to write is at `0x00005555555597d0`. It seems that the offset is 1296 bytes. However, there is a header containing metadata about the chunk size that starts 8 bytes before the data. Therefore, the offset is actually 1288. The metadata is `0x21`, which consists of the chunk length (32 = 0x20), with the least significant bit set as a flag (`PREV_INUSE`).
 
 
 
