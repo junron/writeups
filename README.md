@@ -5,8 +5,8 @@ Writeups are organized by year, while notes are organized by category. These not
 
 **Writeups**
 
-- [2021](writeups/2021)
-- [2020](writeups/2020)
+- [2021](2021)
+- [2020](2020)
 
 **Notes**
 

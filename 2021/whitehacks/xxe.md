@@ -71,5 +71,3 @@ Note: This comment can also be found by HTML inspecting the page :<
 
 Setting the XXE path to `/home/l0j0/flag.txt` reveals the flag: `WH2021{th3_sup3r_s3cr3t_tr34sur3!}`
 
-
-
