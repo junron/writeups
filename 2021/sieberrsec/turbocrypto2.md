@@ -104,6 +104,6 @@ which is completely expected and ok since I've already gotten the flag.
 
 ## Comments
 
-I actually got really confused when writing this writeup cos I saw `0x0c` as `0xc0` and thought the index was 64. During the CTF I used `.index` to find the writeup so it was fine. I also got the chance to use the really useful pwntools `hexdump` function, which was cool.
+I actually got really confused when writing this writeup cos I saw `0x0c` as `0xc0` and thought the index was 64. During the CTF I used `.index` to find the index so it was fine. I also got the chance to use the really useful pwntools `hexdump` function, which was cool.
 
 Thanks again to the authors for this great challenge and the nitro!
