@@ -58,7 +58,7 @@ int main(void)
 
 Of course, when I saw the challenge name, I thought it was going to be a really complex heap challenge, so I popped up gdb and started debugging the binary. 
 
-![image-20211227064425507](C:\Users\Lam Jun Rong\Desktop\ctf\writeups\2021\sieberrsec\images\heap_chunks.png)
+![image-20211227064425507](./images/heap_chunks.png)
 
 Unfortunately, the chunk we can write to (0x0000555555577d10) is after the chunk we want to write to (0x5555555596b0) so we probably can't do a heap overflow. The code doesn't seem vulnerable to heap overflows anyway. There are no frees, so it's probably not a "traditional" heap challenge.
 

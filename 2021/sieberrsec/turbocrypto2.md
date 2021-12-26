@@ -68,11 +68,11 @@ print(hexdump(l))
 
 As expected, we see the flag, then a bunch of memory addresses.
 
-![image-20211227072236432](.\images\dump.png)
+![image-20211227072236432](./images/dump.png)
 
 If you run this a few times, you'll find that the leak addresses are different every time, except for the first byte (the LSB, things are little endian here) ~~(and also the second digit of the second byte but that's not important)~~. This is probably due to PIE or some other kind of ASLR for shared objects, which randomizes the addresses of functions. Anyway, I ran `objdump -d <the shared object>` to find out what these functions were:
 
-![image-20211227072656684](.\images\objdump.png)
+![image-20211227072656684](./images/objdump.png)
 
 Hmmm, the `encrypt` function ends in `0xc0`, which is exactly the same as the leaked address we saw earlier! And the `print_flag` function's address only differs by 1 byte! If we're able to modify the `0xc0` to `0xa0` we can (hopefully) get the `print_flag` function to be called.
 
