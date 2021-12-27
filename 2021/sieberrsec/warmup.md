@@ -100,7 +100,7 @@ context.binary = e
 
 def setup():
     #p = e.process()
-    p = remote("halls.sieberrsec.tech",3476)
+    p = remote("challs.sieberrsec.tech",3476)
     return p
 if __name__ == '__main__':
     p = setup()
